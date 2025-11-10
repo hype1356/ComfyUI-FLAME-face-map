@@ -30,17 +30,17 @@ dev = [
 ]
 
 [project.urls]
-Repository = "https://github.com/your_github_username/flame_face_normal_map"
-BugTracker = "https://github.com/your_github_username/flame_face_normal_map/issues"
-Documentation = "https://github.com/your_github_username/flame_face_normal_map/wiki"
+Repository = "https://github.com/hype1356/flame_face_normal_map"
+BugTracker = "https://github.com/hype1356/flame_face_normal_map/issues"
+Documentation = "https://github.com/hype1356/flame_face_normal_map/wiki"
 
 
 [tool.comfy]
-PublisherId = "your_github_username"
+PublisherId = "hype1356"
 DisplayName = "FLAME Face Normal Map"
 Icon = ""
 Tags = []
-Repository = "https://github.com/your_github_username/flame_face_normal_map"
+Repository = "https://github.com/hype1356/flame_face_normal_map"
 
 includes = []
 
