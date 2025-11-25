@@ -25,14 +25,17 @@ class _flameConfig:
     num_worker = 4
     ring_margin = 0.5
     ring_loss_weight = 1.0
-    shape_params = 100
-    expression_params = 50
+    shape_params = 300
+    expression_params = 100
     pose_params = 6
     optimize_eyeballpose = True
     optimize_neckpose = True
     use_3D_translation = True
 
-class FLAME_face_normal_gen:
+RANDOM_SHAPE_VARIANCE = 2
+RANDOM_EXPRESSION_VARIANCE = 2
+
+class FLAME_face_map_gen:
     """
     Generate FLAME face normal map.
     """
@@ -66,7 +69,7 @@ class FLAME_face_normal_gen:
             },
             "required": {
                 "Randomize_Shape": (["enable", "disable"],),
-                "Randomize_Expression": (["enable", "disable"],),
+                "Randomize_Expression": (["enable", "disable", "neutral"],),
                 "Randomize_Pose": (["enable", "disable", "look ahead"],),
                 "Randomize_Neck_Pose": (["enable", "disable", "straight"],),
             },
@@ -76,8 +79,8 @@ class FLAME_face_normal_gen:
     def IS_CHANGED(cls, **kwargs):
         return float("NaN")
 
-    RETURN_TYPES = ("IMAGE", "MASK")
-    RETURN_NAMES = ("Face Normal Map Output", "Mask Output")
+    RETURN_TYPES = ("IMAGE", "IMAGE", "MASK")
+    RETURN_NAMES = ("Face Normal Map Output", "Face Depth Map Output", "Mask Output")
     DESCRIPTION = cleandoc(__doc__)
     FUNCTION = "generate"
 
@@ -94,15 +97,20 @@ class FLAME_face_normal_gen:
                 raise ValueError(f"Shape parameter must have length {self.config.shape_params}.")
             shape_params = torch.tensor([shape_values], dtype=torch.float32)
         else:
-            shape_params = torch.randn(1, self.config.shape_params)
+            shape_params = torch.randn(1, self.config.shape_params) * RANDOM_SHAPE_VARIANCE
 
-        if Randomize_Expression == "disable" and Expression:
-            expression_values = [float(x) for x in Expression.split(",")]
-            if len(expression_values) != self.config.expression_params:
-                raise ValueError(f"Expression parameter must have length {self.config.expression_params}.")
-            expression_params = torch.tensor([expression_values], dtype=torch.float32)
-        else:
-            expression_params = torch.randn(1, self.config.expression_params)
+        match Randomize_Expression:
+            case "disable":
+                expression_values = [float(x) for x in Expression.split(",")]
+                if len(expression_values) != self.config.expression_params:
+                    raise ValueError(f"Expression parameter must have length {self.config.expression_params}.")
+                expression_params = torch.tensor([expression_values], dtype=torch.float32)
+
+            case "enable":
+                expression_params = torch.randn(1, self.config.expression_params) * RANDOM_EXPRESSION_VARI
+
+            case "neutral":
+                expression_params = torch.zeros(1, self.config.expression_params)
 
         match Randomize_Pose:
             case "disable":
@@ -164,7 +172,7 @@ class FLAME_face_normal_gen:
             .contiguous()
         )
 
-        # Generate a normal map
+        # Generate vertex normals
         meshes = Meshes(
             verts=vertices,
             faces=faces_tensor
@@ -218,13 +226,18 @@ class FLAME_face_normal_gen:
         # Normals are in [-1, 1] range. We need to convert to [0, 1] for saving.
         normal_map_image = (normal_map_tensor * 0.5) + 0.5
 
-        return (normal_map_image, mask_tensor)
+        # Depth map
+        pixel_depths = fragments.zbuf[..., 0]
+        pixel_depths = torch.nan_to_num(pixel_depths, nan=0.0, posinf=0.0, neginf=0.0)
+        depth_map_tensor = pixel_depths * mask_tensor.squeeze(1)
+
+        return (normal_map_image, depth_map_tensor, mask_tensor)
 
 
 NODE_CLASS_MAPPINGS = {
-    "FLAME_face_normal_gen": FLAME_face_normal_gen
+    "FLAME_face_map_gen": FLAME_face_map_gen
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "FLAME_face_normal_gen": "FLAME Face Normal Generator"
+    "FLAME_face_map_gen": "FLAME Face Map Generator"
 }

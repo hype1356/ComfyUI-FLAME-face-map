@@ -3,9 +3,9 @@ requires = ["setuptools>=70.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "flame_face_normal_map"
+name = "flame_face_map"
 version = "0.0.1"
-description = "Generates normal maps of faces using FLAME"
+description = "Generates maps of faces using FLAME"
 authors = [
   {name = "Swayem Kandangwa", email = "sk5g22@soton.ac.uk"}
 ]
