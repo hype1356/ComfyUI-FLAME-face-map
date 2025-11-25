@@ -107,7 +107,7 @@ class FLAME_face_map_gen:
                 expression_params = torch.tensor([expression_values], dtype=torch.float32)
 
             case "enable":
-                expression_params = torch.randn(1, self.config.expression_params) * RANDOM_EXPRESSION_VARI
+                expression_params = torch.randn(1, self.config.expression_params) * RANDOM_EXPRESSION_VARIANCE
 
             case "neutral":
                 expression_params = torch.zeros(1, self.config.expression_params)
@@ -229,7 +229,27 @@ class FLAME_face_map_gen:
         # Depth map
         pixel_depths = fragments.zbuf[..., 0]
         pixel_depths = torch.nan_to_num(pixel_depths, nan=0.0, posinf=0.0, neginf=0.0)
-        depth_map_tensor = pixel_depths * mask_tensor.squeeze(1)
+        
+        # Normalize depth values to [0, 1] range for visualization
+        masked_depths = pixel_depths.clone()
+        masked_depths[mask_tensor.squeeze(1) == 0] = float('nan')
+        
+        valid_depths = masked_depths[~torch.isnan(masked_depths)]
+        if valid_depths.numel() > 0:
+            min_depth = valid_depths.min()
+            max_depth = valid_depths.max()
+            
+            if max_depth > min_depth:
+                # Invert so closer pixels are brighter (higher values)
+                depth_map_tensor = 1.0 - ((pixel_depths - min_depth) / (max_depth - min_depth))
+                depth_map_tensor = depth_map_tensor * mask_tensor.squeeze(1)
+            else:
+                depth_map_tensor = pixel_depths * mask_tensor.squeeze(1)
+        else:
+            depth_map_tensor = pixel_depths * mask_tensor.squeeze(1)
+        
+        # Add batch dimension if needed and convert to 3-channel for IMAGE output
+        depth_map_tensor = depth_map_tensor.unsqueeze(-1).expand(-1, -1, -1, 3)
 
         return (normal_map_image, depth_map_tensor, mask_tensor)
 
