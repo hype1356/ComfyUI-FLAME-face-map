@@ -32,8 +32,8 @@ class _flameConfig:
     optimize_neckpose = True
     use_3D_translation = True
 
-RANDOM_SHAPE_VARIANCE = 1.2
-RANDOM_EXPRESSION_VARIANCE = 1.2
+RANDOM_SHAPE_VARIANCE = 1.0
+RANDOM_EXPRESSION_VARIANCE = 1.0
 
 class FLAME_face_map_gen:
     """
