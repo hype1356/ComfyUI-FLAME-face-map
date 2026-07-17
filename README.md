@@ -1,4 +1,4 @@
-# FLAME Face Normal Map
+# ComfyUI FLAME face map
 
 Generates normal maps of faces using FLAME
 
