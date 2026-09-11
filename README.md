@@ -46,10 +46,10 @@ This node comes with the FLAME 2023 model.
 | **`Randomize_Expression`** | COMBO | `enable`, `disable`, `neutral` | Controls expression randomization, manual input, or neutral face. |
 | **`Randomize_Pose`** | COMBO | `enable`, `disable`, `look ahead` | Controls pose randomization, manual input, or look-ahead alignment. |
 | **`Randomize_Neck_Pose`** | COMBO | `enable`, `disable`, `straight` | Controls neck randomization, manual input, or straight posture. |
-| **`Shape`** *(Optional)* | STRING | 300 comma-separated floats | Custom shape coefficients (used when `Randomize_Shape` is `disable`). |
-| **`Expression`** *(Optional)* | STRING | 100 comma-separated floats | Custom expression coefficients (used when `Randomize_Expression` is `disable`). |
-| **`Pose`** *(Optional)* | STRING | 6 comma-separated floats | Custom pose coefficients (used when `Randomize_Pose` is `disable`). |
-| **`Neck_Pose`** *(Optional)* | STRING | 3 comma-separated floats | Custom neck coefficients (used when `Randomize_Neck_Pose` is `disable`). |
+| **`Shape`** *(Optional)* | STRING | 300 comma-separated floats (You can enter less than 300 values and the rest will be filled with zeroes) | Custom shape coefficients (used when `Randomize_Shape` is `disable`). |
+| **`Expression`** *(Optional)* | STRING | 100 comma-separated floats (You can enter less than 100 values and the rest will be filled with zeroes) | Custom expression coefficients (used when `Randomize_Expression` is `disable`). |
+| **`Pose`** *(Optional)* | STRING | 6 comma-separated floats (You can enter less than 6 values and the rest will be filled with zeroes) | Custom pose coefficients (used when `Randomize_Pose` is `disable`). |
+| **`Neck_Pose`** *(Optional)* | STRING | 3 comma-separated floats (You can enter less than 3 values and the rest will be filled with zeroes) | Custom neck coefficients (used when `Randomize_Neck_Pose` is `disable`). |
 
 #### Outputs
 

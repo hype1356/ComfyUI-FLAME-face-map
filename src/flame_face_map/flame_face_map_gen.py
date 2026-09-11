@@ -44,6 +44,9 @@ def _parse_params(param_str: str, expected_length: int, param_name: str) -> torc
     """Parse a comma-separated float string into a float32 tensor of shape (1, expected_length).
 
     If param_str is empty or whitespace, defaults to zeros (neutral).
+
+    If length of comma-separated float string is shorter than expected, the rest of the
+    values are filled with zeros.
     """
     cleaned = param_str.strip() if param_str else ""
     if not cleaned:
@@ -55,7 +58,8 @@ def _parse_params(param_str: str, expected_length: int, param_name: str) -> torc
         raise ValueError(f"Failed to parse {param_name} parameters: all values must be valid floats. {e}") from e
 
     if len(values) != expected_length:
-        raise ValueError(f"{param_name} parameter must have length {expected_length}, but got {len(values)} values.")
+        # Fill the rest with zeros
+        values.extend([0.0] * (expected_length - len(values)))
 
     return torch.tensor([values], dtype=torch.float32)
 
@@ -133,16 +137,16 @@ class FLAME_face_map_gen:
         return {
             "optional": {
                 "Shape": ("STRING", {
-                    "tooltip": f"Shape parameter in FLAME model\n Format: comma-separated floats of length {cls.config.shape_params}\n Example: 0.0,1.2,0.5,-0.3"
+                    "tooltip": f"Shape parameter in FLAME model\n Format: comma-separated floats of length {cls.config.shape_params}\n Example: 0.0,1.2,0.5,-0.3 \n\n If length is shorter, the rest will be filled with zeros."
                 }),
                 "Expression": ("STRING", {
-                    "tooltip": f"Expression parameter in FLAME model\n Format: comma-separated floats of length {cls.config.expression_params}\n Example: 0.0,1.2,0.5,-0.3"
+                    "tooltip": f"Expression parameter in FLAME model\n Format: comma-separated floats of length {cls.config.expression_params}\n Example: 0.0,1.2,0.5,-0.3 \n\n If length is shorter, the rest will be filled with zeros."
                 }),
                 "Pose": ("STRING", {
-                    "tooltip": f"Pose parameter in FLAME model\n Format: comma-separated floats of length {cls.config.pose_params}\n Example: 0.0,1.2,0.5,-0.3,..."
+                    "tooltip": f"Pose parameter in FLAME model\n Format: comma-separated floats of length {cls.config.pose_params}\n Example: 0.0,1.2,0.5,-0.3,... \n\n If length is shorter, the rest will be filled with zeros."
                 }),
                 "Neck_Pose": ("STRING", {
-                    "tooltip": "Neck Pose parameter in FLAME model\n Format: comma-separated floats of length 3\n Example: 0.0,1.2,0.5"
+                    "tooltip": "Neck Pose parameter in FLAME model\n Format: comma-separated floats of length 3\n Example: 0.0,1.2,0.5 \n\n If length is shorter, the rest will be filled with zeros."
                 }),
             },
             "required": {
