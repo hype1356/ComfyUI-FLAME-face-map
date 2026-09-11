@@ -39,7 +39,6 @@ class FLAME(nn.Module):
 
     def __init__(self, config):
         super(FLAME, self).__init__()
-        print("creating the FLAME Decoder")
         with open(config.flame_model_path, "rb") as f:
             self.flame_model = Struct(**pickle.load(f, encoding="latin1"))
         self.batch_size = config.batch_size
@@ -141,13 +140,24 @@ class FLAME(nn.Module):
         return:
             vertices: N X V X 3
         """
+        device = self.v_template.device
+        dtype = self.dtype
+
+        if shape_params is not None:
+            shape_params = shape_params.to(device=device, dtype=dtype)
+        if expression_params is not None:
+            expression_params = expression_params.to(device=device, dtype=dtype)
+        if pose_params is not None:
+            pose_params = pose_params.to(device=device, dtype=dtype)
+
+        neck_pose = neck_pose.to(device=device, dtype=dtype) if neck_pose is not None else self.neck_pose
+        eye_pose = eye_pose.to(device=device, dtype=dtype) if eye_pose is not None else self.eye_pose
+        transl = transl.to(device=device, dtype=dtype) if transl is not None else self.transl
+
         betas = torch.cat(
             [shape_params, self.shape_betas, expression_params, self.expression_betas],
             dim=1,
         )
-        neck_pose = neck_pose if neck_pose is not None else self.neck_pose
-        eye_pose = eye_pose if eye_pose is not None else self.eye_pose
-        transl = transl if transl is not None else self.transl
         full_pose = torch.cat(
             [pose_params[:, :3], neck_pose, pose_params[:, 3:], eye_pose], dim=1
         )
@@ -169,3 +179,4 @@ class FLAME(nn.Module):
             vertices = vertices + transl.unsqueeze(dim=1)
 
         return vertices
+

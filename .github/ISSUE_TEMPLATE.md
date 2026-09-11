@@ -1,4 +1,4 @@
-* flame_face_normal_map version:
+* ComfyUI-FLAME-face-map version:
 * Python version:
 * Operating System:
 

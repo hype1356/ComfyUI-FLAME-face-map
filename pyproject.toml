@@ -3,55 +3,57 @@ requires = ["setuptools>=70.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "flame_face_map"
+name = "comfyui-flame-face-map"
 version = "0.0.1"
-description = "Generates maps of faces using FLAME"
+description = "ComfyUI custom node to generate 3D face normal maps, depth maps, and masks using the FLAME model"
 authors = [
   {name = "Swayem Kandangwa", email = "sk5g22@soton.ac.uk"}
 ]
 readme = "README.md"
 license = {text = "GNU General Public License v3"}
 requires-python = ">=3.10"
-classifiers = []
-dependencies = [
-
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Multimedia :: Graphics :: 3D Modeling",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
-
-
+dependencies = [
+    "numpy",
+    "torch",
+    "smplx",
+]
 
 [project.optional-dependencies]
 dev = [
     "bump-my-version",
-    "coverage",  # testing
     "mypy",  # linting
     "pre-commit", # runs linting on commit
-    "pytest",  # testing
     "ruff",  # linting
 ]
 
 [project.urls]
-Repository = "https://github.com/hype1356/flame_face_normal_map"
-BugTracker = "https://github.com/hype1356/flame_face_normal_map/issues"
-Documentation = "https://github.com/hype1356/flame_face_normal_map/wiki"
-
+Repository = "https://github.com/hype1356/ComfyUI-FLAME-face-map"
+BugTracker = "https://github.com/hype1356/ComfyUI-FLAME-face-map/issues"
 
 [tool.comfy]
 PublisherId = "hype1356"
-DisplayName = "FLAME Face Normal Map"
+DisplayName = "ComfyUI FLAME Face Map"
 Icon = ""
-Tags = []
-Repository = "https://github.com/hype1356/flame_face_normal_map"
+Tags = ["flame", "3d", "face", "normal-map", "depth-map", "mask"]
+Repository = "https://github.com/hype1356/ComfyUI-FLAME-face-map"
 
 includes = []
 
-[tool.setuptools.package-data]
-"*" = ["*.*"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
-[tool.pytest.ini_options]
-minversion = "8.0"
-testpaths = [
-    "tests",
-]
+[tool.setuptools.package-data]
+"flame_face_map" = ["*.pkl"]
+"*" = ["*.*"]
 
 [tool.mypy]
 files = "."
@@ -61,17 +63,11 @@ strict = true
 warn_unreachable = true
 warn_no_return = true
 
-[[tool.mypy.overrides]]
-# Don't require test functions to include types
-module = "tests.*"
-allow_untyped_defs = true
-disable_error_code = "attr-defined"
-
 [tool.ruff]
-# extend-exclude = ["static", "ci/templates"]
 line-length = 140
-src = ["src", "tests"]
-target-version = "py39"
+src = ["src"]
+target-version = "py310"
+
 
 # Add rules to ban exec/eval
 [tool.ruff.lint]
@@ -79,9 +75,9 @@ select = [
     "S102",  # exec-builtin
     "S307",  # eval-used
     "W293",
-    "F",  # The "F" series in Ruff stands for "Pyflakes" rules, which catch various Python syntax errors and undefined names.
-    # See all rules here: https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "F",  # Pyflakes rules
 ]
 
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "double"
+
